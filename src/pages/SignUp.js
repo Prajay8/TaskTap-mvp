@@ -12,7 +12,7 @@ export default function SignUp() {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/');
+      navigate('/post-task');
     } catch (error) {
       alert(error.message);
     }
