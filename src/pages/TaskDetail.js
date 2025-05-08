@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function TaskDetail() {
   const { id } = useParams();
   const [task, setTask] = useState(null);
+  const [user] = useAuthState(auth);
+  const [claiming, setClaiming] = useState(false);
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -21,7 +29,35 @@ export default function TaskDetail() {
     fetchTask();
   }, [id]);
 
-  if (task === null) return <p className="text-center mt-20 text-gray-500">Loading task...</p>;
+  const handleClaim = async () => {
+    if (!user) {
+      alert('Please log in to claim a task.');
+      return;
+    }
+
+    if (task.claimedBy) {
+      alert('This task has already been claimed.');
+      return;
+    }
+
+    setClaiming(true);
+    try {
+      const taskRef = doc(db, 'tasks', id);
+      await updateDoc(taskRef, {
+        claimedBy: user.uid,
+        claimedAt: serverTimestamp(),
+      });
+      setTask(prev => ({ ...prev, claimedBy: user.uid }));
+    } catch (error) {
+      console.error('Failed to claim task:', error);
+      alert('Something went wrong.');
+    }
+    setClaiming(false);
+  };
+
+  if (task === null) {
+    return <p className="text-center mt-20 text-gray-500">Loading task...</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8">
@@ -35,9 +71,19 @@ export default function TaskDetail() {
           <li><strong>Date/Time:</strong> {task.datetime}</li>
         </ul>
 
-        <button className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
-          Claim This Task
-        </button>
+        {task.claimedBy ? (
+          <button className="w-full bg-gray-300 text-gray-600 py-2 rounded cursor-not-allowed" disabled>
+            Task Already Claimed
+          </button>
+        ) : (
+          <button
+            onClick={handleClaim}
+            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            disabled={claiming}
+          >
+            {claiming ? 'Claiming...' : 'Claim This Task'}
+          </button>
+        )}
       </div>
     </div>
   );
