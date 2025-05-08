@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { db } from '../firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase';
 
 export default function PostTask() {
   const [title, setTitle] = useState('');
@@ -7,20 +11,36 @@ export default function PostTask() {
   const [location, setLocation] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [user] = useAuthState(auth);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const taskData = {
       title,
       description,
-      price,
+      price : Number(price),
       location,
-      datetime: `${date} ${time}`
+      datetime: `${date} ${time}`,
+      userId: user?.uid,
+      createdAt: serverTimestamp(),
     };
 
-    console.log('Task posted:', taskData);
-    // 🔜 Hook into Firebase later
+    try {
+        await addDoc(collection(db, 'tasks'), taskData);
+        alert('Task posted successfully!');
+
+        // Clear form
+        setTitle('');
+        setDescription('');
+        setPrice('');
+        setLocation('');
+        setDate('');
+        setTime('');
+    } catch (error) {
+        console.error('Error posting task:', error);
+        alert('Failed to post task.');
+    }
   };
 
   return (
