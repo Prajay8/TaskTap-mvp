@@ -12,7 +12,7 @@ export default function Login() {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/post-task');
+      navigate('/tasks');
     } catch (error) {
       alert(error.message);
     }
@@ -22,7 +22,7 @@ export default function Login() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      navigate('/post-task');
+      navigate('/tasks');
     } catch (error) {
       alert(error.message);
     }

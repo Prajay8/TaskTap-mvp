@@ -9,7 +9,6 @@ import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 
-
 function App() {
   return (
     <Router>

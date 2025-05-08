@@ -22,7 +22,8 @@ export default function Header() {
 
         <nav className="flex gap-4 items-center text-gray-700 text-sm sm:text-base">
           <Link to="/" className="hover:text-blue-600 transition">Home</Link>
-          {user && (
+          <Link to="/tasks" className="hover:text-blue-600 transition">Browse Tasks</Link> {/* 👈 NEW */}
+          {user ? (
             <>
               <Link to="/post-task" className="hover:text-blue-600 transition">Post Task</Link>
               <Link to="/profile" className="hover:text-blue-600 transition">Profile</Link>
@@ -33,8 +34,7 @@ export default function Header() {
                 Logout
               </button>
             </>
-          )}
-          {!user && (
+          ) : (
             <>
               <Link to="/login" className="hover:text-blue-600 transition">Login</Link>
               <Link to="/signup" className="hover:text-blue-600 transition">Sign Up</Link>
