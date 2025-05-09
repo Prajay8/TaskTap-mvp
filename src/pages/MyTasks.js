@@ -45,9 +45,11 @@ export default function MyTasks() {
                 <div key={task.id} className="bg-white p-4 rounded shadow border-l-4 border-green-500">
                   <h3 className="text-lg font-semibold text-gray-700">{task.title}</h3>
                   <p className="text-sm text-gray-600">{task.description}</p>
-                  <div className="text-sm text-gray-500 mt-2">
-                    📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
-                  </div>
+                    <div className="text-sm text-gray-500 mt-2 flex gap-4 items-center">
+                        <span>📍 {task.location}</span>
+                        <span>💰 ${task.price}</span>
+                        <span>🕒 {task.datetime}</span>
+                    </div>
                 </div>
               ))}
             </div>
@@ -64,12 +66,14 @@ export default function MyTasks() {
                 <div key={task.id} className="bg-white p-4 rounded shadow border-l-4 border-blue-500">
                   <h3 className="text-lg font-semibold text-gray-700">{task.title}</h3>
                   <p className="text-sm text-gray-600">{task.description}</p>
-                  <div className="text-sm text-gray-500 mt-2">
-                    📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
-                    {task.claimedBy && (
+                    <div className="text-sm text-gray-500 mt-2 flex gap-4 items-center">
+                        <span>📍 {task.location}</span>
+                        <span>💰 ${task.price}</span>
+                        <span>🕒 {task.datetime}</span>
+                        {task.claimedBy && (
                       <p className="text-sm text-green-600 mt-1">✅ Claimed</p>
-                    )}
-                  </div>
+                        )}
+                    </div>
                 </div>
               ))}
             </div>

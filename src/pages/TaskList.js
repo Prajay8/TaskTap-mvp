@@ -32,14 +32,16 @@ export default function TaskList() {
           ) : (
             <div className="space-y-4">
               {availableTasks.map(task => (
-                <Link to={`/tasks/${task.id}`} key={task.id}>
-                  <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
+                <Link to={`/tasks/${task.id}`} key={task.id} className="block mb-4">
+                <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
                     <h3 className="text-lg font-semibold text-blue-600">{task.title}</h3>
                     <p className="text-gray-700">{task.description}</p>
-                    <div className="text-sm text-gray-500 mt-2">
-                      📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
+                    <div className="text-sm text-gray-500 mt-2 flex gap-4 items-center">
+                        <span>📍 {task.location}</span>
+                        <span>💰 ${task.price}</span>
+                        <span>🕒 {task.datetime}</span>
                     </div>
-                  </div>
+                </div>
                 </Link>
               ))}
             </div>
@@ -61,9 +63,11 @@ export default function TaskList() {
                 >
                   <h3 className="text-lg font-semibold text-gray-700">{task.title}</h3>
                   <p className="text-gray-600">{task.description}</p>
-                  <div className="text-sm text-gray-500 mt-2">
-                    📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
-                  </div>
+                    <div className="text-sm text-gray-500 mt-2 flex gap-4 items-center">
+                        <span>📍 {task.location}</span>
+                        <span>💰 ${task.price}</span>
+                        <span>🕒 {task.datetime}</span>
+                    </div>
                   {user && task.claimedBy === user.uid && (
                     <p className="mt-1 text-green-600 text-sm font-semibold">✅ Claimed by you</p>
                   )}
