@@ -27,6 +27,7 @@ export default function Header() {
             <>
               <Link to="/post-task" className="hover:text-blue-600 transition">Post Task</Link>
               <Link to="/profile" className="hover:text-blue-600 transition">Profile</Link>
+              <Link to="/my-tasks" className="hover:text-blue-600 transition">My Tasks</Link>
               <button
                 onClick={handleLogout}
                 className="text-red-500 hover:text-red-600 transition"

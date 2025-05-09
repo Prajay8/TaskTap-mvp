@@ -8,6 +8,7 @@ import TaskDetail from './pages/TaskDetail';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
+import MyTasks from './pages/MyTasks';
 
 function App() {
   return (
@@ -20,11 +21,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/tasks" element={<TaskList />} />
           <Route path="/tasks/:id" element={<TaskDetail />} />
+          <Route
+            path="/my-tasks" element={
+              <PrivateRoute>
+                <MyTasks />
+              </PrivateRoute>
+            }
+          />
 
           {/* Protected Routes */}
           <Route
-            path="/post-task"
-            element={
+            path="/post-task" element={
               <PrivateRoute>
                 <PostTask />
               </PrivateRoute>

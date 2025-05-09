@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function TaskList() {
   const [tasks, setTasks] = useState([]);
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -17,24 +19,59 @@ export default function TaskList() {
     fetchTasks();
   }, []);
 
+  const availableTasks = tasks.filter(task => !task.claimedBy);
+  const claimedTasks = tasks.filter(task => task.claimedBy);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Available Tasks</h2>
-      <div className="max-w-4xl mx-auto space-y-4">
-        {tasks.length === 0 && (
-          <p className="text-center text-gray-500">No tasks posted yet.</p>
-        )}
-        {tasks.map(task => (
-            <Link to={`/tasks/${task.id}`}>
-            <div key={task.id} className="bg-white p-4 rounded shadow hover:shadow-md transition">
-                <h3 className="text-lg font-semibold text-blue-600">{task.title}</h3>
-                <p className="text-gray-700">{task.description}</p>
-                <div className="text-sm text-gray-500 mt-2">
-                📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
-                </div>
+      <div className="max-w-4xl mx-auto space-y-10">
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">🔷 Available Tasks</h2>
+          {availableTasks.length === 0 ? (
+            <p className="text-gray-500">No available tasks right now.</p>
+          ) : (
+            <div className="space-y-4">
+              {availableTasks.map(task => (
+                <Link to={`/tasks/${task.id}`} key={task.id}>
+                  <div className="bg-white p-4 rounded shadow hover:shadow-md transition">
+                    <h3 className="text-lg font-semibold text-blue-600">{task.title}</h3>
+                    <p className="text-gray-700">{task.description}</p>
+                    <div className="text-sm text-gray-500 mt-2">
+                      📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
-            </Link>
-        ))}
+          )}
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">🔒 Claimed Tasks</h2>
+          {claimedTasks.length === 0 ? (
+            <p className="text-gray-500">No tasks have been claimed yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {claimedTasks.map(task => (
+                <div
+                  key={task.id}
+                  className={`bg-gray-100 p-4 rounded border ${
+                    user && task.claimedBy === user.uid ? 'border-green-400' : 'border-gray-300'
+                  }`}
+                >
+                  <h3 className="text-lg font-semibold text-gray-700">{task.title}</h3>
+                  <p className="text-gray-600">{task.description}</p>
+                  <div className="text-sm text-gray-500 mt-2">
+                    📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
+                  </div>
+                  {user && task.claimedBy === user.uid && (
+                    <p className="mt-1 text-green-600 text-sm font-semibold">✅ Claimed by you</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
