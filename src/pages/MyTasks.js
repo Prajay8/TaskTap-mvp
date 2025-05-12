@@ -54,6 +54,7 @@ export default function MyTasks() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-4xl mx-auto space-y-10">
+        {/* Claimed Tasks */}
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">✅ Tasks You've Claimed</h2>
           {claimedTasks.length === 0 ? (
@@ -73,6 +74,7 @@ export default function MyTasks() {
           )}
         </div>
 
+        {/* Posted Tasks */}
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">📌 Tasks You've Posted</h2>
           {postedTasks.length === 0 ? (
@@ -89,12 +91,21 @@ export default function MyTasks() {
                       <p className="text-sm text-green-600 mt-1">✅ Claimed</p>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleDelete(task.id)}
-                    className="absolute top-2 right-2 text-red-600 text-sm hover:underline"
-                  >
-                    Delete
-                  </button>
+
+                  <div className="absolute top-2 right-2 space-x-2">
+                    <a
+                      href={`/edit-task/${task.id}`}
+                      className="text-blue-600 text-sm hover:underline"
+                    >
+                      Edit
+                    </a>
+                    <button
+                      onClick={() => handleDelete(task.id)}
+                      className="text-red-600 text-sm hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import MyTasks from './pages/MyTasks';
+import EditTask from './pages/EditTask';
 
 function App() {
   return (
@@ -42,6 +43,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/edit-task/:id"
+            element={
+              <PrivateRoute>
+                <EditTask />
               </PrivateRoute>
             }
           />
