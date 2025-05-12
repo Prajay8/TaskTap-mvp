@@ -107,6 +107,12 @@ export default function Profile() {
         >
           Log Out
         </button>
+        <button
+            onClick={() => navigate('/edit-profile')}
+            className="w-full mt-4 bg-gray-100 text-gray-700 py-2 rounded hover:bg-gray-200 transition"
+            >
+            Edit Profile
+        </button>
       </div>
     </div>
   );
