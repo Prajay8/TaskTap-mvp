@@ -7,7 +7,6 @@ export default function EditTask() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -25,7 +24,6 @@ export default function EditTask() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setTask(data);
           setFormData({
             title: data.title || '',
             description: data.description || '',
@@ -129,12 +127,21 @@ export default function EditTask() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          >
-            Save Changes
-          </button>
+          <div className="flex justify-between gap-4">
+            <button
+                type="submit"
+                className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            >
+                Save Changes
+            </button>
+            <button
+                type="button"
+                onClick={() => navigate('/my-tasks')}
+                className="flex-1 bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300 transition"
+            >
+                Cancel
+            </button>
+            </div>
         </form>
       </div>
     </div>
