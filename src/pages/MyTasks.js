@@ -16,6 +16,9 @@ export default function MyTasks() {
   const [claimedTasks, setClaimedTasks] = useState([]);
   const [postedTasks, setPostedTasks] = useState([]);
 
+  const [showModal, setShowModal] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
+
   useEffect(() => {
     if (!user) return;
 
@@ -34,13 +37,17 @@ export default function MyTasks() {
     fetchTasks();
   }, [user]);
 
-  const handleDelete = async (taskId) => {
-    const confirm = window.confirm('Are you sure you want to delete this task?');
-    if (!confirm) return;
+  const handleDeleteConfirm = (taskId) => {
+    setTaskToDelete(taskId);
+    setShowModal(true);
+  };
 
+  const confirmDelete = async () => {
     try {
-      await deleteDoc(doc(db, 'tasks', taskId));
-      setPostedTasks(prev => prev.filter(task => task.id !== taskId));
+      await deleteDoc(doc(db, 'tasks', taskToDelete));
+      setPostedTasks(prev => prev.filter(task => task.id !== taskToDelete));
+      setShowModal(false);
+      setTaskToDelete(null);
     } catch (err) {
       console.error('Error deleting task:', err);
       alert('Failed to delete the task. Please try again.');
@@ -100,7 +107,7 @@ export default function MyTasks() {
                       Edit
                     </a>
                     <button
-                      onClick={() => handleDelete(task.id)}
+                      onClick={() => handleDeleteConfirm(task.id)}
                       className="text-red-600 text-sm hover:underline"
                     >
                       Delete
@@ -112,6 +119,34 @@ export default function MyTasks() {
           )}
         </div>
       </div>
+
+      {/* Custom Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-md w-full max-w-sm text-center">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              Are you sure you want to delete this task?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={confirmDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setTaskToDelete(null);
+                }}
+                className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
