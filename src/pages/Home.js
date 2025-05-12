@@ -3,28 +3,39 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
-      <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-4">
-        Welcome to TaskTap
-      </h1>
-      <p className="text-lg sm:text-xl text-gray-600 max-w-xl mb-6">
-        A trusted local marketplace to get small tasks done — or earn extra by helping people around you.
-      </p>
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col items-center text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-600">
+          Welcome to TaskTap
+        </h1>
+        <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl">
+          TaskTap helps you get small tasks done fast — or earn extra by helping people near you.
+        </p>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Link to="/signup">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg transition">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link
+            to="/signup"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
             Get Started
-          </button>
-        </Link>
-        <Link to="/login">
-          <button className="border border-gray-400 text-gray-700 px-6 py-3 rounded-lg text-lg hover:bg-gray-100 transition">
+          </Link>
+          <Link
+            to="/login"
+            className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition"
+          >
             I already have an account
-          </button>
-        </Link>
+          </Link>
+        </div>
       </div>
 
-      <p className="mt-8 text-sm text-gray-400">📍 Serving UT Dallas & nearby communities</p>
+      <div className="bg-white py-12 px-6 mt-10 shadow-inner">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-2xl font-semibold">How it works</h2>
+          <p>Post a task in seconds. Taskers nearby can pick it up instantly.</p>
+          <p>Earn money doing simple things like moving boxes, setting up furniture, or grabbing groceries.</p>
+          <p>Students, part-timers, and neighbors — all trusted, reviewed, and nearby.</p>
+        </div>
+      </div>
     </div>
   );
 }
