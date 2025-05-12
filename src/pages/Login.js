@@ -26,7 +26,7 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/tasks');
+      navigate('/complete-profile');
     } catch (err) {
       if (err.code === 'auth/user-not-found') {
         setError('No user found with this email.');
@@ -47,7 +47,7 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate('/tasks');
+      navigate('/complete-profile');
     } catch (err) {
       setError('Google login failed. Please try again.');
     }

@@ -51,7 +51,7 @@ export default function SignUp() {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate('/tasks');
+      navigate('/complete-profile');
     } catch (err) {
       setError('Google sign-up failed. Please try again.');
     }
