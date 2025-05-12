@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function MyTasks() {
@@ -14,12 +22,10 @@ export default function MyTasks() {
     const fetchTasks = async () => {
       const tasksRef = collection(db, 'tasks');
 
-      // Claimed by me
       const q1 = query(tasksRef, where('claimedBy', '==', user.uid), orderBy('createdAt', 'desc'));
       const snap1 = await getDocs(q1);
       setClaimedTasks(snap1.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-      // Posted by me
       const q2 = query(tasksRef, where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
       const snap2 = await getDocs(q2);
       setPostedTasks(snap2.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -27,6 +33,19 @@ export default function MyTasks() {
 
     fetchTasks();
   }, [user]);
+
+  const handleDelete = async (taskId) => {
+    const confirm = window.confirm('Are you sure you want to delete this task?');
+    if (!confirm) return;
+
+    try {
+      await deleteDoc(doc(db, 'tasks', taskId));
+      setPostedTasks(prev => prev.filter(task => task.id !== taskId));
+    } catch (err) {
+      console.error('Error deleting task:', err);
+      alert('Failed to delete the task. Please try again.');
+    }
+  };
 
   if (!user) {
     return <p className="text-center mt-20 text-gray-500">Please log in to view your tasks.</p>;
@@ -45,11 +64,9 @@ export default function MyTasks() {
                 <div key={task.id} className="bg-white p-4 rounded shadow border-l-4 border-green-500">
                   <h3 className="text-lg font-semibold text-gray-700">{task.title}</h3>
                   <p className="text-sm text-gray-600">{task.description}</p>
-                    <div className="text-sm text-gray-500 mt-2 flex gap-4 items-center">
-                        <span>📍 {task.location}</span>
-                        <span>💰 ${task.price}</span>
-                        <span>🕒 {task.datetime}</span>
-                    </div>
+                  <div className="text-sm text-gray-500 mt-2">
+                    📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
+                  </div>
                 </div>
               ))}
             </div>
@@ -63,17 +80,21 @@ export default function MyTasks() {
           ) : (
             <div className="space-y-4">
               {postedTasks.map(task => (
-                <div key={task.id} className="bg-white p-4 rounded shadow border-l-4 border-blue-500">
+                <div key={task.id} className="bg-white p-4 rounded shadow border-l-4 border-blue-500 relative">
                   <h3 className="text-lg font-semibold text-gray-700">{task.title}</h3>
                   <p className="text-sm text-gray-600">{task.description}</p>
-                    <div className="text-sm text-gray-500 mt-2 flex gap-4 items-center">
-                        <span>📍 {task.location}</span>
-                        <span>💰 ${task.price}</span>
-                        <span>🕒 {task.datetime}</span>
-                        {task.claimedBy && (
+                  <div className="text-sm text-gray-500 mt-2">
+                    📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
+                    {task.claimedBy && (
                       <p className="text-sm text-green-600 mt-1">✅ Claimed</p>
-                        )}
-                    </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDelete(task.id)}
+                    className="absolute top-2 right-2 text-red-600 text-sm hover:underline"
+                  >
+                    Delete
+                  </button>
                 </div>
               ))}
             </div>
