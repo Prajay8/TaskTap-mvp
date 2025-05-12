@@ -5,6 +5,9 @@ import {
   signInWithPopup
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -26,7 +29,13 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/complete-profile');
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+
+      if (userDoc.exists()) {
+        navigate('/tasks');
+      } else {
+        navigate('/complete-profile');
+      }
     } catch (err) {
       if (err.code === 'auth/user-not-found') {
         setError('No user found with this email.');
@@ -47,7 +56,13 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate('/complete-profile');
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+
+      if (userDoc.exists()) {
+        navigate('/tasks');
+      } else {
+        navigate('/complete-profile');
+      }
     } catch (err) {
       setError('Google login failed. Please try again.');
     }

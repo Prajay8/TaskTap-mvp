@@ -5,6 +5,9 @@ import {
 } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -32,7 +35,13 @@ export default function SignUp() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate('/tasks');
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+
+      if (userDoc.exists()) {
+        navigate('/tasks');
+      } else {
+        navigate('/complete-profile');
+      }
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
         setError('This email is already in use.');
