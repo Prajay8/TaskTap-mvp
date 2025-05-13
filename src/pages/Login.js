@@ -58,11 +58,11 @@ export default function Login() {
       await signInWithPopup(auth, googleProvider);
       const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
 
-      if (userDoc.exists()) {
-        navigate('/tasks');
-      } else {
-        navigate('/complete-profile');
-      }
+    if (userDoc.exists()) {
+      navigate('/tasks');
+    } else {
+      navigate('/complete-profile');
+    }
     } catch (err) {
       setError('Google login failed. Please try again.');
     }

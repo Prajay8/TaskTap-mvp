@@ -8,6 +8,7 @@ import {
   orderBy,
   deleteDoc,
   doc,
+  getDoc
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
@@ -25,13 +26,41 @@ export default function MyTasks() {
     const fetchTasks = async () => {
       const tasksRef = collection(db, 'tasks');
 
+      // Claimed by me
       const q1 = query(tasksRef, where('claimedBy', '==', user.uid), orderBy('createdAt', 'desc'));
       const snap1 = await getDocs(q1);
       setClaimedTasks(snap1.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
+      // Posted by me
       const q2 = query(tasksRef, where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
       const snap2 = await getDocs(q2);
-      setPostedTasks(snap2.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+      const enrichedPosted = await Promise.all(
+        snap2.docs.map(async docSnap => {
+          const task = docSnap.data();
+          let claimedByName = null;
+
+          if (task.claimedBy) {
+            try {
+              const userDoc = await getDoc(doc(db, 'users', task.claimedBy));
+              if (userDoc.exists()) {
+                const data = userDoc.data();
+                claimedByName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+              }
+            } catch (err) {
+              console.error('Error fetching claimed user:', err);
+            }
+          }
+
+          return {
+            id: docSnap.id,
+            ...task,
+            claimedByName
+          };
+        })
+      );
+
+      setPostedTasks(enrichedPosted);
     };
 
     fetchTasks();
@@ -95,7 +124,9 @@ export default function MyTasks() {
                   <div className="text-sm text-gray-500 mt-2">
                     📍 {task.location} | 💰 ${task.price} | 🕒 {task.datetime}
                     {task.claimedBy && (
-                      <p className="text-sm text-green-600 mt-1">✅ Claimed</p>
+                      <p className="text-sm text-green-600 mt-1">
+                        ✅ Claimed by: {task.claimedByName || 'User'}
+                      </p>
                     )}
                   </div>
 
@@ -120,7 +151,7 @@ export default function MyTasks() {
         </div>
       </div>
 
-      {/* Custom Confirmation Modal */}
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-md w-full max-w-sm text-center">

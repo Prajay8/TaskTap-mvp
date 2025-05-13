@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { db, auth } from '../firebase';
 import {
   doc,
@@ -11,6 +11,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function TaskDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [task, setTask] = useState(null);
   const [user] = useAuthState(auth);
   const [claiming, setClaiming] = useState(false);
@@ -62,6 +63,15 @@ export default function TaskDetail() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        
+        {/* 🔙 Back Button */}
+        <button
+          onClick={() => navigate('/tasks')}
+          className="text-sm text-blue-600 hover:underline mb-4"
+        >
+          ← Back to Browse Tasks
+        </button>
+
         <h1 className="text-2xl font-bold mb-2 text-blue-600">{task.title}</h1>
         <p className="text-gray-700 mb-4">{task.description}</p>
 
@@ -69,6 +79,7 @@ export default function TaskDetail() {
           <li><strong>Location:</strong> {task.location}</li>
           <li><strong>Price:</strong> ${task.price}</li>
           <li><strong>Date/Time:</strong> {task.datetime}</li>
+          <li><strong>Posted by:</strong> {task.postedBy || 'Unknown'}</li>
         </ul>
 
         {task.claimedBy ? (
