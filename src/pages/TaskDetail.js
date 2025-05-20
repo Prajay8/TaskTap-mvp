@@ -6,6 +6,10 @@ import {
   getDoc,
   updateDoc,
   serverTimestamp,
+  getDocs,
+  collection,
+  orderBy,
+  query
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
@@ -15,19 +19,34 @@ export default function TaskDetail() {
   const [task, setTask] = useState(null);
   const [user] = useAuthState(auth);
   const [claiming, setClaiming] = useState(false);
+  const [allTaskIds, setAllTaskIds] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(null);
 
   useEffect(() => {
-    const fetchTask = async () => {
-      const taskRef = doc(db, 'tasks', id);
-      const taskSnap = await getDoc(taskRef);
-      if (taskSnap.exists()) {
-        setTask({ id: taskSnap.id, ...taskSnap.data() });
-      } else {
-        setTask(null);
+    const fetchTaskAndList = async () => {
+      try {
+        const taskRef = doc(db, 'tasks', id);
+        const taskSnap = await getDoc(taskRef);
+        if (taskSnap.exists()) {
+          setTask({ id: taskSnap.id, ...taskSnap.data() });
+
+          // Get all task IDs in order
+          const q = query(collection(db, 'tasks'), orderBy('createdAt', 'asc'));
+          const snap = await getDocs(q);
+          const ids = snap.docs.map(doc => doc.id);
+          setAllTaskIds(ids);
+
+          const index = ids.findIndex(tid => tid === taskSnap.id);
+          setCurrentIndex(index);
+
+          window.scrollTo(0, 0); // scroll to top when viewing different task
+        }
+      } catch (error) {
+        console.error('Error loading task:', error);
       }
     };
 
-    fetchTask();
+    fetchTaskAndList();
   }, [id]);
 
   const handleClaim = async () => {
@@ -56,15 +75,15 @@ export default function TaskDetail() {
     setClaiming(false);
   };
 
-  if (task === null) {
+  if (!task) {
     return <p className="text-center mt-20 text-gray-500">Loading task...</p>;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
-        
-        {/* 🔙 Back Button */}
+
+        {/* Back Button */}
         <button
           onClick={() => navigate('/tasks')}
           className="text-sm text-blue-600 hover:underline mb-4"
@@ -95,6 +114,27 @@ export default function TaskDetail() {
             {claiming ? 'Claiming...' : 'Claim This Task'}
           </button>
         )}
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-6">
+          {currentIndex < allTaskIds.length - 1 && (
+            <button
+              onClick={() => navigate(`/tasks/${allTaskIds[currentIndex + 1]}`)}
+              className="text-blue-600 text-sm hover:underline"
+            >
+              ← Previous Task
+            </button>
+          )}
+          {currentIndex > 0 && (
+            <button
+              onClick={() => navigate(`/tasks/${allTaskIds[currentIndex - 1]}`)}
+              className="text-blue-600 text-sm hover:underline"
+            >
+              Next Task →
+            </button>
+          )}
+        </div>
+
       </div>
     </div>
   );
